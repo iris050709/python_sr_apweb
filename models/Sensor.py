@@ -1,3 +1,4 @@
+from datetime import datetime
 from config import db
 
 class Sensor(db.Model):
@@ -14,5 +15,8 @@ class Sensor(db.Model):
             "nombre": self.nombre,
             "tipo": self.tipo,
             "ubicacion": self.ubicacion,
-            "fecha_instalacion": self.fecha_instalacion.strftime('%Y-%m-%d %H:%M:%S')
+            "fecha_instalacion": (
+                self.fecha_instalacion.strftime('%Y-%m-%d %H:%M:%S')
+                if isinstance(self.fecha_instalacion, datetime) else self.fecha_instalacion
+            )
         }
