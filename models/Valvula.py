@@ -1,4 +1,5 @@
 from config import db
+from datetime import datetime
 
 class Valvula(db.Model):
     __tablename__ = 'valvulas'
@@ -10,10 +11,24 @@ class Valvula(db.Model):
     fecha_instalacion = db.Column(db.TIMESTAMP, nullable=False, server_default=db.func.current_timestamp())
 
     def to_dict(self):
+        fecha_instalacion = self.fecha_instalacion
+
+        if isinstance(fecha_instalacion, str):
+            if fecha_instalacion == "0000-00-00 00:00:00":
+                return {
+                    "id": self.id,
+                    "nombre": self.nombre,
+                    "ubicacion": self.ubicacion,
+                    "estado": self.estado,
+                    "fecha_instalacion": None  # Evita el error devolviendo `None`
+                }
+            fecha_instalacion = datetime.strptime(fecha_instalacion, "%Y-%m-%d %H:%M:%S")
+
         return {
             "id": self.id,
             "nombre": self.nombre,
             "ubicacion": self.ubicacion,
             "estado": self.estado,
-            "fecha_instalacion": self.fecha_instalacion.strftime('%Y-%m-%d %H:%M:%S')
+            "fecha_instalacion": fecha_instalacion.strftime('%Y-%m-%d %H:%M:%S') if fecha_instalacion else None
         }
+

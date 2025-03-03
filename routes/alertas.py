@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from controllers.alertaController import get_all_alertas, get_alerta_by_id, create_alerta, update_alerta, delete_alerta
+
 alerta_bp = Blueprint('alertas', __name__)
 
 # Obtener todas las alertas
@@ -26,18 +27,19 @@ def store():
     nueva_alerta = create_alerta(usuario_id, mensaje)
     return jsonify(nueva_alerta)
 
-# Actualizar una alerta por ID
+# **Usar la función update_alerta() en lugar de reescribir la lógica**
 @alerta_bp.route('/<int:alerta_id>', methods=['PUT'])
 def update(alerta_id):
     data = request.get_json()
     usuario_id = data.get('usuario_id')
     mensaje = data.get('mensaje')
 
-    if not mensaje:
-        return jsonify({"message": "El mensaje es obligatorio"}), 400
+    if not usuario_id or not mensaje:
+        return jsonify({"message": "Usuario y mensaje son obligatorios"}), 400
 
-    alerta_actualizada = update_alerta(alerta_id, usuario_id, mensaje)
-    return jsonify(alerta_actualizada)
+    resultado = update_alerta(alerta_id, usuario_id, mensaje)
+
+    return jsonify(resultado)
 
 # Eliminar una alerta por ID
 @alerta_bp.route('/<int:alerta_id>', methods=['DELETE'])
