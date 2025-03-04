@@ -16,6 +16,6 @@ class ConfiguracionRiego(db.Model):
             "id": self.id,
             "usuario_id": self.usuario_id,
             "umbral_humedad": float(self.umbral_humedad),
-            "horario": str(self.horario),
-            "activo": bool(self.activo)
+            "horario": self.horario.strftime("%H:%M:%S"),  # Se corrigió la coma faltante
+            "activo": True if self.activo == 1 else False  # Convierte 1 en True y 0 en False
         }
