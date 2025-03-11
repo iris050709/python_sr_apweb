@@ -40,17 +40,19 @@ def update_valvula(valvula_id, nombre, ubicacion, estado):
     try:
         valvula = Valvula.query.get(valvula_id)
         if not valvula:
-            return jsonify({"message": "Válvula no encontrada"}), 404
+            return None
 
         valvula.nombre = nombre
         valvula.ubicacion = ubicacion
         valvula.estado = estado
-        
         db.session.commit()
+        
         return valvula.to_dict()
-    except Exception as e:
-        print(f"ERROR: {e}")
-        return jsonify({"message": "Error al actualizar la válvula"}), 500
+    except Exception as error:
+        print(f"ERROR: {error}")
+        db.session.rollback()
+        return None
+
 
 # ELIMINAR UNA VÁLVULA POR ID
 def delete_valvula(valvula_id):
