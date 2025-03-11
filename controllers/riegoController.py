@@ -1,6 +1,8 @@
 from models.Riego import Riego
 from flask import request, jsonify
 from config import db  
+from datetime import datetime
+
 
 # FUNCION PARA OBTENER TODOS LOS REGISTROS DE RIEGO
 def get_all_riegos():
@@ -25,12 +27,13 @@ def get_riego_by_id(riego_id):
 
 
 # FUNCION PARA CREAR UN REGISTRO DE RIEGO
-def create_riego(valvula_id, cantidad_agua, duracion):
+def create_riego(valvula_id, cantidad_agua, duracion, fecha_riego=None):
     try:
-        new_riego = Riego(valvula_id=valvula_id, cantidad_agua=cantidad_agua, duracion=duracion)
+        if not fecha_riego:
+            fecha_riego = datetime.now()  # Asignar la fecha y hora actuales si no se proporciona
+        new_riego = Riego(valvula_id=valvula_id, cantidad_agua=cantidad_agua, duracion=duracion, fecha_riego=fecha_riego)
         db.session.add(new_riego)
         db.session.commit()
-
         return new_riego.to_dict()
     except Exception as e:
         print(f"ERROR: {e}")
@@ -48,7 +51,7 @@ def update_riego(riego_id, valvula_id, cantidad_agua, duracion):
         riego.duracion = duracion
         
         db.session.commit()
-        return riego.to_json()
+        return riego.to_dict()
     except Exception as e:
         print(f"ERROR: {e}")
         return jsonify({"error": "Error al actualizar riego"}), 500

@@ -26,7 +26,8 @@ def show(riego_id):
 @riego_bp.route('/', methods=['POST'])
 def store():
     data = request.get_json()
-    required_fields = ['valvula_id', 'cantidad_agua', 'duracion']
+    print(data)
+    required_fields = ['valvula_id', 'cantidad_agua', 'duracion', 'fecha_riego']
 
     # Verificar campos obligatorios
     missing_fields = [field for field in required_fields if field not in data]
