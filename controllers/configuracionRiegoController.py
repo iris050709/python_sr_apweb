@@ -15,11 +15,13 @@ def get_configuracion_by_id(config_id):
     try:
         config = ConfiguracionRiego.query.get(config_id)
         if config:
-            return jsonify(config.to_dict())
+            return config.to_dict()  # Return the dictionary directly
         else:
-            return jsonify({"message": "Configuración no encontrada"}), 404
+            return {"message": "Configuración no encontrada"}, 404  # Return data as a dictionary with a 404 status code
     except Exception as error:
         print(f"ERROR: {error}")
+        return {"message": "Error al obtener la configuración"}, 500  # Handle the exception and return a 500 error
+
 
 # FUNCION PARA CREAR UNA CONFIGURACIÓN DE RIEGO
 def create_configuracion(usuario_id, umbral_humedad, horario, activo):

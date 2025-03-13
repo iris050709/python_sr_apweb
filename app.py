@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, send_from_directory, abort
 from config import db, migrate
 from dotenv import load_dotenv
 import os
@@ -9,7 +9,21 @@ load_dotenv()
 
 # Crear instancia de Flask
 app = Flask(__name__) 
-CORS(app)
+CORS(app, origins="http://localhost:3000")
+
+UPLOAD_FOLDER = "uploads"
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+# Crear la carpeta si no existe
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+@app.route("/uploads/<filename>")
+def get_image(filename):
+    try:
+        return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
+    except FileNotFoundError:
+        abort(404, description="Imagen no encontrada")
 
 # Configuración de la base de datos
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')

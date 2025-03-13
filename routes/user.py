@@ -1,10 +1,17 @@
-from flask import Blueprint, request, jsonify
+import os
+from flask import Blueprint, request, jsonify, current_app
 from werkzeug.security import generate_password_hash
-from datetime import datetime
+from werkzeug.utils import secure_filename
 from controllers.userController import get_all_users, get_user_by_id, create_user, update_user, delete_user
 
 # Creación del Blueprint para usuarios
 user_bp = Blueprint('users', __name__)
+
+# Extensiones permitidas para archivos de imagen
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Obtener todos los usuarios
 @user_bp.route('/', methods=['GET'])
@@ -15,66 +22,83 @@ def index():
 # Obtener un usuario por ID
 @user_bp.route('/<int:user_id>', methods=['GET'])
 def show(user_id):
-    return get_user_by_id(user_id)
+    user = get_user_by_id(user_id)
+    if not user:
+        return jsonify({"message": "Usuario no encontrado"}), 404
+    return jsonify(user)
 
 # Crear un usuario
 @user_bp.route('/', methods=['POST'])
 def user_store():
-    data = request.get_json()
-    required_fields = ['nombre', 'correo', 'password', 'rol', 'foto', 'fecha_nacimiento', 'sexo']
+    data = request.form
+    required_fields = ['nombre', 'correo', 'password', 'rol', 'fecha_nacimiento', 'sexo']
 
     if not all(field in data for field in required_fields):
         return jsonify({"message": "Todos los campos son obligatorios"}), 400
 
+    # Procesar imagen (foto)
+    foto = request.files.get('foto')
+    filename = None
+    if foto and allowed_file(foto.filename):
+        filename = secure_filename(foto.filename)
+        upload_folder = current_app.config.get("UPLOAD_FOLDER", "uploads")
+        filepath = os.path.join(upload_folder, filename)
+        foto.save(filepath)
+    elif foto:
+        return jsonify({"message": "Formato de imagen no permitido"}), 400
+
+    # Crear usuario en la base de datos
     new_user = create_user(
-        data['nombre'], data['correo'], data['password'], 
-        data['rol'], data['foto'], data['fecha_nacimiento'], data['sexo']
+        nombre=data['nombre'],
+        correo=data['correo'],
+        password=generate_password_hash(data['password']),
+        rol=data['rol'],
+        foto_filename=filename,
+        fecha_nacimiento=data['fecha_nacimiento'],
+        sexo=data['sexo']
     )
-    
-    return jsonify(new_user)
+    return jsonify(new_user), 201
 
 # Actualizar un usuario por ID
 @user_bp.route('/<int:user_id>', methods=['PUT'])
 def user_update(user_id):
-    data = request.get_json()
-
-    # List of required fields
+    data = request.form
     required_fields = ['nombre', 'correo', 'password', 'rol', 'fecha_nacimiento', 'sexo']
-
-    # Check if all required fields are present
     if not all(field in data for field in required_fields):
         return jsonify({"message": "Todos los campos son obligatorios"}), 400
 
-    # Fetch the user to update
     user = get_user_by_id(user_id)
     if not user:
-        return jsonify({"message": "Usuario no encontrado"}), 404  # User not found
+        return jsonify({"message": "Usuario no encontrado"}), 404
 
-    # Validate and hash the password if changed
     password_hash = generate_password_hash(data['password'])
+    
+    # Procesar imagen (foto)
+    foto = request.files.get('foto')
+    filename = user.get('foto', None)  # Mantener la foto actual si no se sube una nueva
+    if foto and allowed_file(foto.filename):
+        filename = secure_filename(foto.filename)
+        upload_folder = current_app.config.get("UPLOAD_FOLDER", "uploads")
+        filepath = os.path.join(upload_folder, filename)
+        foto.save(filepath)
+    elif foto:
+        return jsonify({"message": "Formato de imagen no permitido"}), 400
 
-    # Parse the date of birth and ensure it's in a valid format
-    try:
-        fecha_nacimiento = datetime.strptime(data['fecha_nacimiento'], "%Y-%m-%d")
-    except ValueError:
-        return jsonify({"message": "El formato de la fecha de nacimiento es inválido. Debe ser YYYY-MM-DD."}), 400
-
-    # Update user with the new data
+    # Actualizar usuario en la base de datos
     try:
         updated_user = update_user(
             user_id,
-            data['nombre'], 
-            data['correo'], 
-            password_hash,  # Store hashed password
-            data['rol'], 
-            data.get('foto'),  # foto can be optional
-            fecha_nacimiento,  # Store as a datetime object
+            data['nombre'],
+            data['correo'],
+            password_hash,
+            data['rol'],
+            filename,
+            data['fecha_nacimiento'],
             data['sexo']
         )
+        return jsonify(updated_user), 200
     except Exception as e:
-        return jsonify({"message": f"Error al actualizar el usuario: {str(e)}"}), 500  # Internal server error
-
-    return jsonify(updated_user), 200  # Return updated user data and 200 OK status
+        return jsonify({"message": f"Error al actualizar el usuario: {str(e)}"}), 500
 
 # Eliminar un usuario por ID
 @user_bp.route('/<int:user_id>', methods=['DELETE'])

@@ -21,10 +21,8 @@ class Usuario(db.Model):
             "nombre": self.nombre,
             "correo": self.correo,
             "rol": self.rol,
-            "foto": self.foto,
+            "foto": f"/uploads/{self.foto}" if self.foto else None,
             "fecha_nacimiento": str(self.fecha_nacimiento),
             "sexo": self.sexo,
             "fecha_registro": str(self.fecha_registro),
-            "resetCode": self.resetCode,
-            "resetCodeExpiration": str(self.resetCodeExpiration) if self.resetCodeExpiration else None,
         }
