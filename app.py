@@ -9,7 +9,7 @@ load_dotenv()
 
 # Crear instancia de Flask
 app = Flask(__name__) 
-CORS(app, origins="http://localhost:3000")
+CORS(app)
 
 UPLOAD_FOLDER = "uploads"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
