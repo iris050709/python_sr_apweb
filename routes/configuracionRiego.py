@@ -26,21 +26,34 @@ def show(configuracion_id):
 
 # Crear una configuración de riego
 @configuracion_riego_bp.route('/', methods=['POST'])
-def create_config():
-    data = request.get_json()
-
-    # Verificar si los datos contienen los campos requeridos
-    required_fields = ['usuario_id', 'umbral_humedad', 'horario', 'activo']
-    if not all(field in data for field in required_fields):
-        return jsonify({"message": "Todos los campos son obligatorios"}), 400
-
+def store():
     try:
-        # Procesa los datos y crea la nueva configuración
-        new_config = create_configuracion(data)
-        return jsonify(new_config), 201  # Retorna la nueva configuración con un código de éxito
-    except Exception as e:
-        return jsonify({'error': str(e)}), 400  # Retorna error si algo sale mal
+        data = request.get_json()
+        if not data:
+            print("No se recibieron datos o el JSON está mal formado")  # Log si no hay datos
+            return jsonify({"message": "Datos inválidos o JSON mal formado"}), 400
 
+        print("Datos recibidos:", data)  # Verifica que los datos se reciban
+
+        # Verifica si los campos obligatorios están presentes
+        required_fields = ['usuario_id', 'umbral_humedad', 'horario', 'activo']
+        if not all(field in data for field in required_fields):
+            return jsonify({"message": "Todos los campos son obligatorios"}), 400
+
+        # Si todo está bien, crea la configuración
+        nueva_configuracion = create_configuracion(
+            data.get('usuario_id'),
+            data.get('umbral_humedad'),
+            data.get('horario'),
+            bool(data.get('activo'))
+        )
+
+        print("Configuración creada:", nueva_configuracion)  # Verifica que se cree la configuración
+
+        return jsonify(nueva_configuracion), 201
+    except Exception as e:
+        print(f"Error inesperado: {str(e)}")  # Log para errores inesperados
+        return jsonify({"message": f"Error al crear la configuración: {str(e)}"}), 500
 
 
 
