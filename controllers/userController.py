@@ -27,11 +27,13 @@ def get_user_by_id(user_id):
     try:
         user = Usuario.query.get(user_id)
         if user:
-            return jsonify(user.to_dict())
+            return jsonify(user.to_dict())  # Asegúrate de que user.to_dict() devuelva un diccionario
         else:
             return jsonify({"message": "Usuario no encontrado"}), 404
     except Exception as error:
         print(f"ERROR: {error}")
+        return jsonify({"message": "Error al buscar el usuario"}), 500
+
 
 # FUNCION PARA CREAR USUARIO
 def create_user(nombre, correo, password, rol, foto_filename, fecha_nacimiento, sexo):
@@ -58,27 +60,23 @@ def create_user(nombre, correo, password, rol, foto_filename, fecha_nacimiento, 
         return {"message": "Error al crear el usuario"}, 500
 
 # EDITAR USUARIO POR ID
-def update_user(user_id, nombre, correo, password, rol, foto_file, fecha_nacimiento, sexo):
+def update_user(user_id, nombre, correo, password, rol, fecha_nacimiento, sexo):
     try:
         user = Usuario.query.get(user_id)
         if not user:
-            return jsonify({"message": "Usuario no encontrado"}), 404
+            return {"message": "Usuario no encontrado"}, 404
 
-        existing_user = Usuario.query.filter_by(correo=correo).first()
-        if existing_user and existing_user.id != user_id:
-            return jsonify({"message": "El correo electrónico ya está registrado"}), 400
+        # Verificar si el correo ya está registrado en otro usuario
+        existing_user = Usuario.query.filter(Usuario.correo == correo, Usuario.id != user_id).first()
+        if existing_user:
+            return {"message": "El correo electrónico ya está registrado en otro usuario"}, 400
 
-        filename = user.foto  # Mantener la foto anterior si no se actualiza
-        if foto_file and allowed_file(foto_file.filename):
-            filename = secure_filename(foto_file.filename)
-            foto_path = os.path.join(UPLOAD_FOLDER, filename)
-            foto_file.save(foto_path)
-        
+        # Actualizar los datos del usuario
         user.nombre = nombre
         user.correo = correo
-        user.password = password
+        if password:  # Solo actualizar si se proporciona una nueva contraseña
+            user.password = password  # Aquí deberías encriptarla antes de guardarla
         user.rol = rol
-        user.foto = filename
         user.fecha_nacimiento = fecha_nacimiento
         user.sexo = sexo
 
