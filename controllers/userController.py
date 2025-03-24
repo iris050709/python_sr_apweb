@@ -34,13 +34,13 @@ def get_user_by_id(user_id):
         print(f"ERROR: {error}")
         return jsonify({"message": "Error al buscar el usuario"}), 500
 
-
 # FUNCION PARA CREAR USUARIO
 def create_user(nombre, correo, password, rol, foto_filename, fecha_nacimiento, sexo):
     try:
+        # Verificar si el correo ya está registrado
         existing_user = Usuario.query.filter_by(correo=correo).first()
         if existing_user:
-            return {"message": "El correo electrónico ya está registrado"}, 400
+            return {"message": "El correo electrónico ya está registrado."}, 400  # Ajustar mensaje aquí
 
         new_user = Usuario(
             nombre=nombre,
@@ -58,6 +58,8 @@ def create_user(nombre, correo, password, rol, foto_filename, fecha_nacimiento, 
     except Exception as e:
         print(f"ERROR: {e}")
         return {"message": "Error al crear el usuario"}, 500
+
+
 
 # EDITAR USUARIO POR ID
 def update_user(user_id, nombre, correo, password, rol, fecha_nacimiento, sexo):
