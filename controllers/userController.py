@@ -27,27 +27,39 @@ def get_user_by_id(user_id):
     try:
         user = Usuario.query.get(user_id)
         if user:
-            return jsonify(user.to_dict())  # Asegúrate de que user.to_dict() devuelva un diccionario
+            return jsonify(user.to_dict())
         else:
             return jsonify({"message": "Usuario no encontrado"}), 404
     except Exception as error:
         print(f"ERROR: {error}")
         return jsonify({"message": "Error al buscar el usuario"}), 500
 
+def email_exists(correo, user_id=None):
+    try:
+        query = Usuario.query.filter(Usuario.correo == correo)
+        if user_id:
+            query = query.filter(Usuario.id != user_id)
+        existing_user = query.first()
+        if existing_user:
+            return {"exists": True, "message": "El correo electrónico ya está registrado."}
+        return {"exists": False, "message": "El correo electrónico no está registrado."}
+    except Exception as e:
+        print(f"ERROR: {e}")
+        return {"exists": False, "message": "Error al verificar el correo."}
+
 # FUNCION PARA CREAR USUARIO
 def create_user(nombre, correo, password, rol, foto_filename, fecha_nacimiento, sexo):
     try:
-        # Verificar si el correo ya está registrado
-        existing_user = Usuario.query.filter_by(correo=correo).first()
-        if existing_user:
-            return {"message": "El correo electrónico ya está registrado."}, 400  # Ajustar mensaje aquí
+        email_check = email_exists(correo)
+        if email_check["exists"]:
+            return {"message": email_check["message"]}, 400
 
         new_user = Usuario(
             nombre=nombre,
             correo=correo,
             password=password,
             rol=rol,
-            foto=foto_filename,  # Guardamos solo el nombre del archivo
+            foto=foto_filename,
             fecha_nacimiento=fecha_nacimiento,
             sexo=sexo
         )
@@ -59,8 +71,6 @@ def create_user(nombre, correo, password, rol, foto_filename, fecha_nacimiento, 
         print(f"ERROR: {e}")
         return {"message": "Error al crear el usuario"}, 500
 
-
-
 # EDITAR USUARIO POR ID
 def update_user(user_id, nombre, correo, password, rol, fecha_nacimiento, sexo):
     try:
@@ -68,16 +78,14 @@ def update_user(user_id, nombre, correo, password, rol, fecha_nacimiento, sexo):
         if not user:
             return {"message": "Usuario no encontrado"}, 404
 
-        # Verificar si el correo ya está registrado en otro usuario
-        existing_user = Usuario.query.filter(Usuario.correo == correo, Usuario.id != user_id).first()
-        if existing_user:
-            return {"message": "El correo electrónico ya está registrado en otro usuario"}, 400
+        email_check = email_exists(correo, user_id)
+        if email_check["exists"]:
+            return {"message": email_check["message"]}, 400
 
-        # Actualizar los datos del usuario
         user.nombre = nombre
         user.correo = correo
-        if password:  # Solo actualizar si se proporciona una nueva contraseña
-            user.password = password  # Aquí deberías encriptarla antes de guardarla
+        if password:
+            user.password = password
         user.rol = rol
         user.fecha_nacimiento = fecha_nacimiento
         user.sexo = sexo
@@ -95,7 +103,6 @@ def delete_user(user_id):
         if not user:
             return {"message": "Usuario no encontrado"}, 404
         
-        # Eliminar la imagen del sistema de archivos
         if user.foto and os.path.exists(user.foto):
             os.remove(user.foto)
         

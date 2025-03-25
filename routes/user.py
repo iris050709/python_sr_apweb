@@ -2,7 +2,7 @@ import os
 from flask import Blueprint, request, jsonify, current_app
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
-from controllers.userController import get_all_users, get_user_by_id, create_user, update_user, delete_user
+from controllers.userController import get_all_users, get_user_by_id, create_user, update_user, delete_user, email_exists
 
 # Creación del Blueprint para usuarios
 user_bp = Blueprint('users', __name__)
@@ -33,6 +33,10 @@ def user_store():
     if not all(field in data for field in required_fields):
         return jsonify({"message": "Todos los campos son obligatorios"}), 400
 
+    # Verificar si el correo ya está registrado
+    if email_exists(data['correo'])['exists']:
+        return jsonify({"message": "Este correo ya está registrado. Usa otro."}), 400
+
     # Procesar imagen (foto)
     foto = request.files.get('foto')
     filename = None
@@ -59,45 +63,36 @@ def user_store():
 # Actualizar un usuario por ID
 @user_bp.route('/<int:user_id>', methods=['PUT'])
 def user_update(user_id):
-    data = request.get_json()  # Obtener los datos enviados en formato JSON
-    print("Datos recibidos:", data)
-    
+    data = request.get_json()
     required_fields = ['nombre', 'correo', 'rol', 'fecha_nacimiento', 'sexo']
 
-    # Verificar si todos los campos obligatorios están presentes
     if not all(field in data for field in required_fields):
         return jsonify({"message": "Todos los campos son obligatorios"}), 400
 
-    # Obtener el usuario por ID usando la función get_user_by_id
     user_response = get_user_by_id(user_id)
-
-    # Verificamos si la respuesta es un error
     if "message" in user_response.json and user_response.json["message"] == "Usuario no encontrado":
-        return user_response  # Devuelve el mensaje de error de la función get_user_by_id
+        return user_response
 
-    # Aquí estamos asumiendo que `user_response` contiene los datos del usuario en formato JSON.
-    user = user_response.json  # Los datos del usuario ya están en formato dict
+    user = user_response.json
+    if data['correo'] != user['correo'] and email_exists(data['correo'])['exists']:
+        return jsonify({"message": "Este correo ya está en uso por otro usuario."}), 400
 
-    # Si el usuario proporciona una nueva contraseña, se encripta y se actualiza
-    password_hash = user.get("password")  # Mantener la contraseña anterior si no hay una nueva
+    password_hash = user.get("password")
     if 'password' in data and data['password'].strip():
-        password_hash = generate_password_hash(data['password'])  # Encriptar la nueva contraseña
+        password_hash = generate_password_hash(data['password'])
 
     try:
-        # Actualizamos el usuario
         updated_user = update_user(
             user_id,
             data['nombre'],
             data['correo'],
-            password_hash,  # Mantener la contraseña si no se envía una nueva
+            password_hash,
             data['rol'],
             data['fecha_nacimiento'],
             data['sexo']
         )
-        return jsonify(updated_user), 200  # Devuelve el usuario actualizado
-
+        return jsonify(updated_user), 200
     except Exception as e:
-        print(f"Error al actualizar el usuario: {str(e)}")
         return jsonify({"message": f"Error al actualizar el usuario: {str(e)}"}), 500
 
 # Eliminar un usuario por ID
@@ -108,3 +103,12 @@ def user_delete(user_id):
         return jsonify(result), 200
     except Exception as e:
         return jsonify({"message": f"Error al eliminar el usuario: {str(e)}"}), 500
+
+# Verificar si un correo ya está registrado
+@user_bp.route('/check-email', methods=['POST'])
+def check_email():
+    data = request.get_json()
+    if 'correo' not in data:
+        return jsonify({"message": "El campo correo es obligatorio"}), 400
+    email_check = email_exists(data['correo'])
+    return jsonify(email_check), 200
