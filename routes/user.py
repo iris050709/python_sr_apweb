@@ -2,7 +2,7 @@ import os
 from flask import Blueprint, request, jsonify, current_app
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
-from controllers.userController import get_all_users, get_user_by_id, create_user, update_user, delete_user, email_exists
+from controllers.userController import get_all_users, get_user_by_id, create_user, login_user, update_user, delete_user, email_exists
 
 # Creación del Blueprint para usuarios
 user_bp = Blueprint('users', __name__)
@@ -112,3 +112,8 @@ def check_email():
         return jsonify({"message": "El campo correo es obligatorio"}), 400
     email_check = email_exists(data['correo'])
     return jsonify(email_check), 200
+
+@user_bp.route('/login', methods = ['POST'])
+def login():
+    data = request.get_json()
+    return login_user(data['correo'], data['password'])

@@ -3,6 +3,7 @@ from config import db, migrate
 from dotenv import load_dotenv
 import os
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
 
 # Cargar variables de entorno
 load_dotenv()
@@ -11,19 +12,8 @@ load_dotenv()
 app = Flask(__name__) 
 CORS(app)
 
-UPLOAD_FOLDER = "uploads"
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-
-# Crear la carpeta si no existe
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-
-@app.route("/uploads/<filename>")
-def get_image(filename):
-    try:
-        return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
-    except FileNotFoundError:
-        abort(404, description="Imagen no encontrada")
+app.config['JWT_SECRET_KEY'] = 'HOLAAAAAAA'
+jwt = JWTManager(app)
 
 # Configuración de la base de datos
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')

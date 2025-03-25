@@ -3,6 +3,7 @@ from flask import request, jsonify
 from werkzeug.utils import secure_filename
 from config import db  
 from models.Usuario import Usuario
+from flask_jwt_extended import create_access_token
 
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -112,3 +113,19 @@ def delete_user(user_id):
     except Exception as e:
         print(f"ERROR: {e}")
         return {"message": "Error al eliminar el usuario"}, 500
+    
+def login_user(correo, password):
+    user = Usuario.query.filter_by(correo=correo).first() 
+    
+    if user and user.check_password(password):  # Verificar la contraseña
+        access_token = create_access_token(identity=user.id)
+        return jsonify({
+            'access_token': access_token,
+            'user': {
+                "id": user.id,
+                "nombre": user.nombre,
+                "correo": user.correo
+            }
+        }), 200
+    
+    return jsonify({"msg": "CREDENCIALES INVÁLIDAS"}), 401
