@@ -55,5 +55,8 @@ app.register_blueprint(sensor_bp, url_prefix='/sensores')
 from routes.valvula import valvula_bp
 app.register_blueprint(valvula_bp, url_prefix='/valvulas')  
 
+from routes.datosSensores import dato_bp
+app.register_blueprint(dato_bp, url_prefix='/datos') 
+
 if __name__ == '__main__':
     app.run(debug=True)
