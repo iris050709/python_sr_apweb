@@ -2,15 +2,16 @@ from flask import jsonify, request
 from models.DatosSensores import DatosSensores
 from config import db
 
-# FUNCION PARA OBTENER TODOS LOS REGISTROS
-
+# FUNCION PARA OBTENER TODOS LOS REGISTROS EN ORDEN DESCENDENTE
 def get_all_datos():
     try:
-        datos = DatosSensores.query.all()
+        # Ordenar los datos por el id en orden descendente
+        datos = DatosSensores.query.order_by(DatosSensores.id.desc()).all()
         return jsonify([dato.to_dict() for dato in datos])
     except Exception as error:
         print(f"ERROR: {error}")
         return jsonify({"message": "Error al obtener los registros"}), 500
+
 
 # FUNCION PARA OBTENER UN REGISTRO POR ID
 def get_dato_by_id(dato_id):
