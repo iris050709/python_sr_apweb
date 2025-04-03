@@ -101,10 +101,23 @@ paths:
                 password:
                   type: string
                   example: "password123"
+                role:
+                  type: string
+                  example: "admin"
+                birthdate:
+                  type: string
+                  format: date
+                  example: "1990-05-15"
+                gender:
+                  type: string
+                  example: "male"
               required:
                 - name
                 - email
                 - password
+                - role
+                - birthdate
+                - gender
       responses:
         '201':
           description: Usuario creado correctamente
@@ -226,6 +239,19 @@ paths:
                 email:
                   type: string
                   example: "juan@example.com"
+                password:
+                  type: string
+                  example: "newpassword123"
+                role:
+                  type: string
+                  example: "user"
+                birthdate:
+                  type: string
+                  format: date
+                  example: "1990-05-15"
+                gender:
+                  type: string
+                  example: "male"
       responses:
         '200':
           description: Usuario actualizado correctamente
@@ -325,49 +351,3 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               examples:
-                internalError:
-                  value:
-                    error: "Internal Server Error"
-                    message: "Hubo un error en el servidor. Inténtelo de nuevo más tarde."
-
-  /login:
-    post:
-      summary: Iniciar sesión de usuario
-      operationId: loginUser
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                  example: "juan@example.com"
-                password:
-                  type: string
-                  example: "password123"
-              required:
-                - email
-                - password
-      responses:
-        '200':
-          description: Inicio de sesión exitoso.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthResponse'
-        '400':
-          description: Datos inválidos. Verifique las credenciales proporcionadas.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                invalidCredentials:
-                  value:
-                    error: "Invalid Credentials"
-                    message: "Las credenciales proporcionadas no son válidas."
-        '401':
-          description: Credenciales incorrectas.
-         
