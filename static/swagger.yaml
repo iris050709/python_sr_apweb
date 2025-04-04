@@ -8,42 +8,13 @@ servers:
   - url: https://3.145.63.126/users/
     description: Servidor local
 
-components:
-  schemas:
-    ErrorResponse:
-      type: object
-      properties:
-        error:
-          type: string
-        message:
-          type: string
-          example: "Error desconocido"
-          
-    AuthResponse:
-      type: object
-      properties:
-        token:
-          type: string
-        user:
-          type: object
-          properties:
-            id:
-              type: integer
-            name:
-              type: string
-              example: "Juan Pérez"
-            email:
-              type: string
-              example: "juan@example.com"
-
 paths:
   /:
     get:
       summary: Obtener todos los usuarios
-      operationId: getUsers
       responses:
         '200':
-          description: Lista de usuarios obtenida correctamente
+          description: Lista de usuarios
           content:
             application/json:
               schema:
@@ -53,74 +24,48 @@ paths:
                   properties:
                     id:
                       type: integer
-                    name:
+                    nombre:
                       type: string
-                      example: "Juan Pérez"
-                    email:
+                    correo:
                       type: string
-                      example: "juan@example.com"
-        '400':
-          description: Solicitud incorrecta. Verifique los parámetros enviados.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                badRequest:
-                  value:
-                    error: "Bad Request"
-                    message: "Los parámetros enviados son incorrectos."
-        '500':
-          description: Error interno del servidor. Inténtelo más tarde.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                internalError:
-                  value:
-                    error: "Internal Server Error"
-                    message: "Hubo un error en el servidor. Inténtelo de nuevo más tarde."
-
+                    rol:
+                      type: string
+                    fecha_nacimiento:
+                      type: string
+                      format: date
+                    sexo:
+                      type: string
+                    foto:
+                      type: string
+                      format: uri
     post:
       summary: Crear un nuevo usuario
-      operationId: createUser
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
-                name:
+                nombre:
                   type: string
-                  example: "Juan Pérez"
-                email:
+                correo:
                   type: string
-                  example: "juan@example.com"
                 password:
                   type: string
-                  example: "password123"
-                role:
+                rol:
                   type: string
-                  example: "admin"
-                birthdate:
+                fecha_nacimiento:
                   type: string
                   format: date
-                  example: "1990-05-15"
-                gender:
+                sexo:
                   type: string
-                  example: "male"
-              required:
-                - name
-                - email
-                - password
-                - role
-                - birthdate
-                - gender
+                foto:
+                  type: string
+                  format: binary
       responses:
         '201':
-          description: Usuario creado correctamente
+          description: Usuario creado
           content:
             application/json:
               schema:
@@ -128,48 +73,36 @@ paths:
                 properties:
                   id:
                     type: integer
-                  name:
+                  nombre:
                     type: string
-                    example: "Juan Pérez"
-                  email:
+                  correo:
                     type: string
-                    example: "juan@example.com"
+                  rol:
+                    type: string
+                  fecha_nacimiento:
+                    type: string
+                    format: date
+                  sexo:
+                    type: string
+                  foto:
+                    type: string
+                    format: uri
         '400':
-          description: Datos inválidos. Verifique que los campos sean correctos y completos.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                invalidData:
-                  value:
-                    error: "Invalid Data"
-                    message: "Verifique que todos los campos sean correctos."
-        '500':
-          description: Error interno del servidor. Inténtelo más tarde.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                internalError:
-                  value:
-                    error: "Internal Server Error"
-                    message: "Hubo un error en el servidor. Inténtelo de nuevo más tarde."
+          description: Error en los datos proporcionados
 
   /{user_id}:
     get:
       summary: Obtener un usuario por ID
-      operationId: getUserById
       parameters:
         - name: user_id
           in: path
           required: true
+          description: ID del usuario
           schema:
             type: integer
       responses:
         '200':
-          description: Datos del usuario obtenidos correctamente
+          description: Información del usuario
           content:
             application/json:
               schema:
@@ -177,53 +110,30 @@ paths:
                 properties:
                   id:
                     type: integer
-                  name:
+                  nombre:
                     type: string
-                    example: "Juan Pérez"
-                  email:
+                  correo:
                     type: string
-                    example: "juan@example.com"
-        '400':
-          description: ID de usuario inválido. Debe ser un número entero.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                invalidUserId:
-                  value:
-                    error: "Invalid User ID"
-                    message: "El ID del usuario debe ser un número entero."
+                  rol:
+                    type: string
+                  fecha_nacimiento:
+                    type: string
+                    format: date
+                  sexo:
+                    type: string
+                  foto:
+                    type: string
+                    format: uri
         '404':
-          description: Usuario no encontrado.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                userNotFound:
-                  value:
-                    error: "User Not Found"
-                    message: "No se encontró un usuario con el ID especificado."
-        '500':
-          description: Error interno del servidor. Inténtelo más tarde.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                internalError:
-                  value:
-                    error: "Internal Server Error"
-                    message: "Hubo un error en el servidor. Inténtelo de nuevo más tarde."
+          description: Usuario no encontrado
 
     put:
       summary: Actualizar un usuario por ID
-      operationId: updateUser
       parameters:
         - name: user_id
           in: path
           required: true
+          description: ID del usuario
           schema:
             type: integer
       requestBody:
@@ -233,28 +143,22 @@ paths:
             schema:
               type: object
               properties:
-                name:
+                nombre:
                   type: string
-                  example: "Juan Pérez"
-                email:
+                correo:
                   type: string
-                  example: "juan@example.com"
                 password:
                   type: string
-                  example: "newpassword123"
-                role:
+                rol:
                   type: string
-                  example: "user"
-                birthdate:
+                fecha_nacimiento:
                   type: string
                   format: date
-                  example: "1990-05-15"
-                gender:
+                sexo:
                   type: string
-                  example: "male"
       responses:
         '200':
-          description: Usuario actualizado correctamente
+          description: Usuario actualizado
           content:
             application/json:
               schema:
@@ -262,92 +166,78 @@ paths:
                 properties:
                   id:
                     type: integer
-                  name:
+                  nombre:
                     type: string
-                    example: "Juan Pérez"
-                  email:
+                  correo:
                     type: string
-                    example: "juan@example.com"
+                  rol:
+                    type: string
+                  fecha_nacimiento:
+                    type: string
+                    format: date
+                  sexo:
+                    type: string
         '400':
-          description: Datos inválidos. Verifique que los campos sean correctos y completos.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                invalidData:
-                  value:
-                    error: "Invalid Data"
-                    message: "Verifique que todos los campos sean correctos."
+          description: Error en los datos proporcionados
         '404':
-          description: Usuario no encontrado.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                userNotFound:
-                  value:
-                    error: "User Not Found"
-                    message: "No se encontró un usuario con el ID especificado."
-        '500':
-          description: Error interno del servidor. Inténtelo más tarde.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                internalError:
-                  value:
-                    error: "Internal Server Error"
-                    message: "Hubo un error en el servidor. Inténtelo de nuevo más tarde."
+          description: Usuario no encontrado
 
     delete:
       summary: Eliminar un usuario por ID
-      operationId: deleteUser
       parameters:
         - name: user_id
           in: path
           required: true
+          description: ID del usuario
           schema:
             type: integer
       responses:
         '200':
-          description: Usuario eliminado correctamente
+          description: Usuario eliminado
+        '404':
+          description: Usuario no encontrado
+
+  /check-email:
+    post:
+      summary: Verificar si un correo está registrado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                correo:
+                  type: string
+      responses:
+        '200':
+          description: Resultado de la verificación del correo
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  message:
-                    type: string
-                    example: "Usuario eliminado correctamente"
+                  exists:
+                    type: boolean
         '400':
-          description: ID de usuario inválido. Debe ser un número entero.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                invalidUserId:
-                  value:
-                    error: "Invalid User ID"
-                    message: "El ID del usuario debe ser un número entero."
-        '404':
-          description: Usuario no encontrado.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                userNotFound:
-                  value:
-                    error: "User Not Found"
-                    message: "No se encontró un usuario con el ID especificado."
-        '500':
-          description: Error interno del servidor. Inténtelo más tarde.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
+          description: El campo correo es obligatorio
+
+  /login:
+    post:
+      summary: Iniciar sesión con correo y contraseña
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                correo:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Respuesta de inicio de sesión exitoso
+        '400':
+          description: Error de autenticación
