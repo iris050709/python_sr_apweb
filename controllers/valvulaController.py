@@ -5,7 +5,8 @@ from config import db
 # OBTENER TODAS LAS VÁLVULAS
 def get_all_valvulas():
     try:
-        valvulas = Valvula.query.all()
+        # Ordenar por 'id' de manera descendente
+        valvulas = Valvula.query.order_by(Valvula.id.desc()).all()
         return [valvula.to_dict() for valvula in valvulas]
     except Exception as error:
         print(f"ERROR: {error}")

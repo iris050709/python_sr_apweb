@@ -17,8 +17,8 @@ def allowed_file(filename):
 
 # FUNCION PARA OBTENER USUARIOS
 def get_all_users():
-    users = Usuario.query.all()
-    try: 
+    users = Usuario.query.order_by(Usuario.id.desc()).all()  # Ordena por 'id' de manera descendente
+    try:
         return [user.to_dict() for user in users]
     except Exception as error:
         print(f"ERROR {error}")

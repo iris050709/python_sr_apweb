@@ -4,11 +4,12 @@ from config import db
 
 # FUNCION PARA OBTENER TODOS LOS SENSORES
 def get_all_sensores():
-    sensores = Sensor.query.all()
     try:
+        sensores = Sensor.query.order_by(Sensor.id.desc()).all()
         return [sensor.to_dict() for sensor in sensores]
     except Exception as error:
         print(f"ERROR: {error}")
+        return []
 
 # FUNCION PARA BUSCAR SENSOR POR ID
 def get_sensor_by_id(sensor_id):

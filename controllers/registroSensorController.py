@@ -5,7 +5,7 @@ from config import db
 # FUNCION PARA OBTENER TODOS LOS REGISTROS DE SENSORES
 def get_all_registros():
     try:
-        registros = RegistroSensor.query.all()
+        registros = RegistroSensor.query.order_by(RegistroSensor.id.desc()).all()
         return jsonify([registro.to_dict() for registro in registros])
     except Exception as error:
         print(f"ERROR: {error}")

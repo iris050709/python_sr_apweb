@@ -7,7 +7,7 @@ from datetime import datetime
 # FUNCION PARA OBTENER TODOS LOS REGISTROS DE RIEGO
 def get_all_riegos():
     try: 
-        riegos = Riego.query.all()
+        riegos = Riego.query.order_by(Riego.id.desc()).all()
         return [riego.to_dict() for riego in riegos]
     except Exception as error:
         print(f"ERROR: {error}")

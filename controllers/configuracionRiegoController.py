@@ -4,11 +4,12 @@ from config import db
 
 # FUNCION PARA OBTENER TODAS LAS CONFIGURACIONES DE RIEGO
 def get_all_configuraciones():
-    configuraciones = ConfiguracionRiego.query.all()
-    try: 
+    try:
+        configuraciones = ConfiguracionRiego.query.order_by(ConfiguracionRiego.id.desc()).all()
         return [config.to_dict() for config in configuraciones]
     except Exception as error:
         print(f"ERROR {error}")
+        return []
 
 # FUNCION PARA BUSCAR UNA CONFIGURACIÓN POR ID
 def get_configuracion_by_id(config_id):

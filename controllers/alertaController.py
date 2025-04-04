@@ -6,7 +6,7 @@ from config import db
 # FUNCION PARA OBTENER ALERTAS
 def get_all_alertas():
     try: 
-        return [alerta.to_dict() for alerta in Alerta.query.all()]
+        return [alerta.to_dict() for alerta in Alerta.query.order_by(Alerta.id.desc()).all()]
     except Exception as error:
         print(f"ERROR {error}")
         return []
