@@ -24,7 +24,7 @@ swaggerui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL,  # La URL donde se sirve Swagger UI
     API_URL,      # Ruta al archivo YAML de Swagger
     config={      # Configuración adicional de Swagger UI
-        'app_name': "User API"
+        'app_name': "Documenación API"
     }
 )
 
