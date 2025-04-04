@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: User API
-  description: API para la gestión de usuarios y datos de IoT.
+  description: API para la gestión de usuarios.
   version: 1.0.0
 
 servers:
@@ -9,7 +9,6 @@ servers:
     description: Servidor local
 
 paths:
-  # Rutas de usuarios
   /:
     get:
       summary: Obtener todos los usuarios
@@ -45,7 +44,24 @@ paths:
                     foto:
                       type: string
                       format: uri
-                      nullable: true
+                      nullable: true  # Hacemos explícito que puede ser null
+              examples:
+                application/json:
+                  value: 
+                    - id: 1
+                      nombre: Juan Pérez
+                      correo: juan.perez@example.com
+                      rol: Usuario
+                      fecha_nacimiento: 1990-01-01
+                      sexo: Masculino
+                      foto: http://example.com/foto.jpg
+                    - id: 2
+                      nombre: María García
+                      correo: maria.garcia@example.com
+                      rol: Administrador
+                      fecha_nacimiento: 1985-05-15
+                      sexo: Femenino
+                      foto: http://example.com/foto2.jpg
         '400':
           description: Solicitud incorrecta
         '500':
@@ -81,14 +97,53 @@ paths:
                 foto:
                   type: string
                   format: binary
-                  nullable: true
+                  nullable: true  # Hacemos explícito que puede ser null
       responses:
         '201':
           description: Usuario creado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  nombre:
+                    type: string
+                  correo:
+                    type: string
+                  rol:
+                    type: string
+                    enum:
+                      - Administrador
+                      - Usuario
+                  fecha_nacimiento:
+                    type: string
+                    format: date
+                  sexo:
+                    type: string
+                    enum:
+                      - Femenino
+                      - Masculino
+                  foto:
+                    type: string
+                    format: uri
+                    nullable: true  # Hacemos explícito que puede ser null
+              examples:
+                application/json:
+                  value:
+                    id: 3
+                    nombre: Pedro López
+                    correo: pedro.lopez@example.com
+                    rol: Usuario
+                    fecha_nacimiento: 1992-03-25
+                    sexo: Masculino
+                    foto: null  # Enviamos foto como null
         '400':
           description: Error en los datos proporcionados
         '500':
           description: Error en el servidor
+
   /{user_id}:
     get:
       summary: Obtener un usuario por ID
@@ -102,10 +157,49 @@ paths:
       responses:
         '200':
           description: Información del usuario
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  nombre:
+                    type: string
+                  correo:
+                    type: string
+                  rol:
+                    type: string
+                    enum:
+                      - Administrador
+                      - Usuario
+                  fecha_nacimiento:
+                    type: string
+                    format: date
+                  sexo:
+                    type: string
+                    enum:
+                      - Femenino
+                      - Masculino
+                  foto:
+                    type: string
+                    format: uri
+                    nullable: true  # Hacemos explícito que puede ser null
+              examples:
+                application/json:
+                  value:
+                    id: 1
+                    nombre: Juan Pérez
+                    correo: juan.perez@example.com
+                    rol: Usuario
+                    fecha_nacimiento: 1990-01-01
+                    sexo: Masculino
+                    foto: http://example.com/foto.jpg
         '404':
           description: Usuario no encontrado
         '500':
           description: Error en el servidor
+
     put:
       summary: Actualizar un usuario por ID
       parameters:
@@ -144,12 +238,46 @@ paths:
       responses:
         '200':
           description: Usuario actualizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  nombre:
+                    type: string
+                  correo:
+                    type: string
+                  rol:
+                    type: string
+                    enum:
+                      - Administrador
+                      - Usuario
+                  fecha_nacimiento:
+                    type: string
+                    format: date
+                  sexo:
+                    type: string
+                    enum:
+                      - Femenino
+                      - Masculino
+              examples:
+                application/json:
+                  value:
+                    id: 1
+                    nombre: Juan Pérez Actualizado
+                    correo: juan.perez.updated@example.com
+                    rol: Administrador
+                    fecha_nacimiento: 1990-01-01
+                    sexo: Masculino
         '400':
           description: Error en los datos proporcionados
         '404':
           description: Usuario no encontrado
         '500':
           description: Error en el servidor
+
     delete:
       summary: Eliminar un usuario por ID
       parameters:
@@ -166,6 +294,7 @@ paths:
           description: Usuario no encontrado
         '500':
           description: Error en el servidor
+
   /check-email:
     post:
       summary: Verificar si un correo está registrado
@@ -188,10 +317,15 @@ paths:
                 properties:
                   exists:
                     type: boolean
+              examples:
+                application/json:
+                  value:
+                    exists: true
         '400':
           description: El campo correo es obligatorio
         '500':
           description: Error en el servidor
+
   /login:
     post:
       summary: Iniciar sesión con correo y contraseña
@@ -216,218 +350,11 @@ paths:
                 properties:
                   token:
                     type: string
+              examples:
+                application/json:
+                  value:
+                    token: "abc123tokenxyz"
         '400':
           description: Error de autenticación
-        '500':
-          description: Error en el servidor
-  
-  # Nuevas rutas para los datos de IoT
-  /iot/datos:
-    get:
-      summary: Obtener todos los registros de sensores
-      responses:
-        '200':
-          description: Lista de registros de sensores
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                    nivel_temperatura1:
-                      type: number
-                      format: float
-                    estado_ventilador1:
-                      type: string
-                    nivel_temperatura2:
-                      type: number
-                      format: float
-                    estado_ventilador2:
-                      type: string
-                    luz:
-                      type: boolean
-                    estado_led:
-                      type: string
-                    agua_detectada:
-                      type: boolean
-                    posicion_servo:
-                      type: number
-                      format: float
-                    humedad_suelo1:
-                      type: number
-                      format: float
-                    estado_bomba1:
-                      type: string
-                    estado_bomba2:
-                      type: string
-                    distancia1:
-                      type: number
-                      format: float
-                    humedad_suelo2:
-                      type: number
-                      format: float
-                    estado_bomba3:
-                      type: string
-                    estado_bomba4:
-                      type: string
-                    distancia2:
-                      type: number
-                      format: float
-        '500':
-          description: Error en el servidor
-    post:
-      summary: Crear un nuevo registro de sensor
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                nivel_temperatura1:
-                  type: number
-                  format: float
-                estado_ventilador1:
-                  type: string
-                nivel_temperatura2:
-                  type: number
-                  format: float
-                estado_ventilador2:
-                  type: string
-                luz:
-                  type: boolean
-                estado_led:
-                  type: string
-                agua_detectada:
-                  type: boolean
-                posicion_servo:
-                  type: number
-                  format: float
-                humedad_suelo1:
-                  type: number
-                  format: float
-                estado_bomba1:
-                  type: string
-                estado_bomba2:
-                  type: string
-                distancia1:
-                  type: number
-                  format: float
-                humedad_suelo2:
-                  type: number
-                  format: float
-                estado_bomba3:
-                  type: string
-                estado_bomba4:
-                  type: string
-                distancia2:
-                  type: number
-                  format: float
-      responses:
-        '201':
-          description: Registro de sensor creado
-        '400':
-          description: Error en los datos proporcionados
-        '500':
-          description: Error en el servidor
-
-  /iot/datos/{dato_id}:
-    get:
-      summary: Obtener un registro de sensor por ID
-      parameters:
-        - name: dato_id
-          in: path
-          required: true
-          description: ID del registro de sensor
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Información del registro de sensor
-        '404':
-          description: Registro de sensor no encontrado
-        '500':
-          description: Error en el servidor
-    put:
-      summary: Actualizar un registro de sensor por ID
-      parameters:
-        - name: dato_id
-          in: path
-          required: true
-          description: ID del registro de sensor
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                nivel_temperatura1:
-                  type: number
-                  format: float
-                estado_ventilador1:
-                  type: string
-                nivel_temperatura2:
-                  type: number
-                  format: float
-                estado_ventilador2:
-                  type: string
-                luz:
-                  type: boolean
-                estado_led:
-                  type: string
-                agua_detectada:
-                  type: boolean
-                posicion_servo:
-                  type: number
-                  format: float
-                humedad_suelo1:
-                  type: number
-                  format: float
-                estado_bomba1:
-                  type: string
-                estado_bomba2:
-                  type: string
-                distancia1:
-                  type: number
-                  format: float
-                humedad_suelo2:
-                  type: number
-                  format: float
-                estado_bomba3:
-                  type: string
-                estado_bomba4:
-                  type: string
-                distancia2:
-                  type: number
-                  format: float
-      responses:
-        '200':
-          description: Registro de sensor actualizado
-        '400':
-          description: Error en los datos proporcionados
-        '404':
-          description: Registro de sensor no encontrado
-        '500':
-          description: Error en el servidor
-    delete:
-      summary: Eliminar un registro de sensor por ID
-      parameters:
-        - name: dato_id
-          in: path
-          required: true
-          description: ID del registro de sensor
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Registro de sensor eliminado
-        '404':
-          description: Registro de sensor no encontrado
         '500':
           description: Error en el servidor
