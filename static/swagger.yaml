@@ -197,12 +197,12 @@ paths:
           description: Error en el servidor
 
 
-  ## --- SENSORES API ---
+  ## --- DATOS API ---
 
   /datos:
     get:
-      summary: Obtener todos los registros de sensores
-      tags: [Sensores]
+      summary: Obtener todos los registros de datos (IOT)
+      tags: [Datos]
       responses:
         '200':
           description: Lista de registros
