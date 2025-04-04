@@ -30,14 +30,41 @@ paths:
                       type: string
                     rol:
                       type: string
+                      enum:
+                        - Administrador
+                        - Usuario
                     fecha_nacimiento:
                       type: string
                       format: date
                     sexo:
                       type: string
+                      enum:
+                        - Femenino
+                        - Masculino
                     foto:
                       type: string
                       format: uri
+              examples:
+                application/json:
+                  value: 
+                    - id: 1
+                      nombre: Juan Pérez
+                      correo: juan.perez@example.com
+                      rol: Usuario
+                      fecha_nacimiento: 1990-01-01
+                      sexo: Masculino
+                      foto: http://example.com/foto.jpg
+                    - id: 2
+                      nombre: María García
+                      correo: maria.garcia@example.com
+                      rol: Administrador
+                      fecha_nacimiento: 1985-05-15
+                      sexo: Femenino
+                      foto: http://example.com/foto2.jpg
+        '400':
+          description: Solicitud incorrecta
+        '500':
+          description: Error en el servidor
     post:
       summary: Crear un nuevo usuario
       requestBody:
@@ -55,11 +82,17 @@ paths:
                   type: string
                 rol:
                   type: string
+                  enum:
+                    - Administrador
+                    - Usuario
                 fecha_nacimiento:
                   type: string
                   format: date
                 sexo:
                   type: string
+                  enum:
+                    - Femenino
+                    - Masculino
                 foto:
                   type: string
                   format: binary
@@ -79,16 +112,34 @@ paths:
                     type: string
                   rol:
                     type: string
+                    enum:
+                      - Administrador
+                      - Usuario
                   fecha_nacimiento:
                     type: string
                     format: date
                   sexo:
                     type: string
+                    enum:
+                      - Femenino
+                      - Masculino
                   foto:
                     type: string
                     format: uri
+              examples:
+                application/json:
+                  value:
+                    id: 3
+                    nombre: Pedro López
+                    correo: pedro.lopez@example.com
+                    rol: Usuario
+                    fecha_nacimiento: 1992-03-25
+                    sexo: Masculino
+                    foto: http://example.com/foto3.jpg
         '400':
           description: Error en los datos proporcionados
+        '500':
+          description: Error en el servidor
 
   /{user_id}:
     get:
@@ -116,16 +167,34 @@ paths:
                     type: string
                   rol:
                     type: string
+                    enum:
+                      - Administrador
+                      - Usuario
                   fecha_nacimiento:
                     type: string
                     format: date
                   sexo:
                     type: string
+                    enum:
+                      - Femenino
+                      - Masculino
                   foto:
                     type: string
                     format: uri
+              examples:
+                application/json:
+                  value:
+                    id: 1
+                    nombre: Juan Pérez
+                    correo: juan.perez@example.com
+                    rol: Usuario
+                    fecha_nacimiento: 1990-01-01
+                    sexo: Masculino
+                    foto: http://example.com/foto.jpg
         '404':
           description: Usuario no encontrado
+        '500':
+          description: Error en el servidor
 
     put:
       summary: Actualizar un usuario por ID
@@ -151,11 +220,17 @@ paths:
                   type: string
                 rol:
                   type: string
+                  enum:
+                    - Administrador
+                    - Usuario
                 fecha_nacimiento:
                   type: string
                   format: date
                 sexo:
                   type: string
+                  enum:
+                    - Femenino
+                    - Masculino
       responses:
         '200':
           description: Usuario actualizado
@@ -172,15 +247,32 @@ paths:
                     type: string
                   rol:
                     type: string
+                    enum:
+                      - Administrador
+                      - Usuario
                   fecha_nacimiento:
                     type: string
                     format: date
                   sexo:
                     type: string
+                    enum:
+                      - Femenino
+                      - Masculino
+              examples:
+                application/json:
+                  value:
+                    id: 1
+                    nombre: Juan Pérez Actualizado
+                    correo: juan.perez.updated@example.com
+                    rol: Administrador
+                    fecha_nacimiento: 1990-01-01
+                    sexo: Masculino
         '400':
           description: Error en los datos proporcionados
         '404':
           description: Usuario no encontrado
+        '500':
+          description: Error en el servidor
 
     delete:
       summary: Eliminar un usuario por ID
@@ -196,6 +288,8 @@ paths:
           description: Usuario eliminado
         '404':
           description: Usuario no encontrado
+        '500':
+          description: Error en el servidor
 
   /check-email:
     post:
@@ -219,8 +313,14 @@ paths:
                 properties:
                   exists:
                     type: boolean
+              examples:
+                application/json:
+                  value:
+                    exists: true
         '400':
           description: El campo correo es obligatorio
+        '500':
+          description: Error en el servidor
 
   /login:
     post:
@@ -239,5 +339,18 @@ paths:
       responses:
         '200':
           description: Respuesta de inicio de sesión exitoso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+              examples:
+                application/json:
+                  value:
+                    token: "abc123tokenxyz"
         '400':
           description: Error de autenticación
+        '500':
+          description: Error en el servidor
