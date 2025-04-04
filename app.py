@@ -30,21 +30,6 @@ swaggerui_blueprint = get_swaggerui_blueprint(
 
 # Registrar el Blueprint de Swagger
 app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
-# Cargar archivo Swagger para IOT
-API_URL_IOT = "/static/swaggerIOT.yaml"  # Ruta al archivo swaggerIOT.yaml
-
-# Configuración de Swagger UI para el archivo IOT
-swaggerui_blueprint_iot = get_swaggerui_blueprint(
-    SWAGGER_URL + "/iot",  # URL donde se servirá la documentación Swagger de IOT
-    API_URL_IOT,           # Ruta al archivo YAML de Swagger para IOT
-    config={               # Configuración adicional de Swagger UI
-        'app_name': "Datos Sensores API"
-    }
-)
-
-# Registrar el Blueprint de Swagger para IOT
-app.register_blueprint(swaggerui_blueprint_iot, url_prefix=SWAGGER_URL + "/iot")
-
 
 # Configuración de la base de datos
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
