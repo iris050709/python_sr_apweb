@@ -211,7 +211,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/SensorData'
+                  $ref: '#/components/schemas/DatoData'
         '500':
           description: Error en el servidor
 
@@ -223,14 +223,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SensorDataInput'
+              $ref: '#/components/schemas/DatoDataInput'
       responses:
         '201':
           description: Registro creado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SensorData'
+                $ref: '#/components/schemas/DatoData'
         '400':
           description: Datos inválidos
         '500':
@@ -252,7 +252,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SensorData'
+                $ref: '#/components/schemas/DatoData'
         '404':
           description: Registro no encontrado
         '500':
