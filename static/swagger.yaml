@@ -5,16 +5,16 @@ info:
   version: 1.0.0
 
 servers:
-  - url: https://3.145.63.126/users/
+  - url: https://3.145.63.126
     description: Servidor Usuarios
-  - url: https://3.145.63.126/datos/
+  - url: https://3.145.63.126
     description: Servidor Datos
 
 paths:
 
   ## --- USERS API ---
 
-  /:
+  /users:
     get:
       summary: Obtener todos los usuarios
       tags: [Usuarios]
@@ -70,7 +70,7 @@ paths:
         '500':
           description: Error en el servidor
 
-  /{user_id}:
+  /users/{user_id}:
     get:
       summary: Obtener un usuario por ID
       tags: [Usuarios]
@@ -138,7 +138,7 @@ paths:
         '500':
           description: Error en el servidor
 
-  /check-email:
+  /users/check-email:
     post:
       summary: Verificar si un correo está registrado
       tags: [Usuarios]
@@ -166,7 +166,7 @@ paths:
         '500':
           description: Error en el servidor
 
-  /login:
+  /users/login:
     post:
       summary: Iniciar sesión
       tags: [Usuarios]
