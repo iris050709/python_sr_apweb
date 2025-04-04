@@ -216,8 +216,8 @@ paths:
           description: Error en el servidor
 
     post:
-      summary: Crear un nuevo registro de sensor
-      tags: [Sensores]
+      summary: Crear un nuevo registro de dato (IOT)
+      tags: [Datos]
       requestBody:
         required: true
         content:
@@ -239,7 +239,7 @@ paths:
   /datos/{dato_id}:
     get:
       summary: Obtener un registro de sensor por ID
-      tags: [Sensores]
+      tags: [Datos]
       parameters:
         - name: dato_id
           in: path
@@ -260,7 +260,7 @@ paths:
 
     delete:
       summary: Eliminar un registro de sensor por ID
-      tags: [Sensores]
+      tags: [Datos]
       parameters:
         - name: dato_id
           in: path
@@ -330,7 +330,7 @@ components:
               format: binary
               nullable: true
 
-    SensorData:
+    DatoData:
       type: object
       properties:
         id:
@@ -383,9 +383,9 @@ components:
           type: number
           format: float
 
-    SensorDataInput:
+    DatoDataInput:
       allOf:
-        - $ref: '#/components/schemas/SensorData'
+        - $ref: '#/components/schemas/DatoData'
       required:
         - nivel_temperatura1
         - estado_ventilador1
