@@ -1,14 +1,14 @@
 openapi: 3.0.0
 info:
-  title: API Unificada - Usuarios y Sensores
-  description: API para la gestión de usuarios y de datos de sensores (IoT).
+  title: API Unificada - Usuarios y Datos
+  description: API para la gestión de usuarios y de datos (IoT).
   version: 1.0.0
 
 servers:
   - url: https://3.145.63.126/users/
     description: Servidor Usuarios
-  - url: https://3.145.63.126/sensores/
-    description: Servidor Sensores
+  - url: https://3.145.63.126/datos/
+    description: Servidor Datos
 
 paths:
 
