@@ -44,6 +44,7 @@ paths:
                     foto:
                       type: string
                       format: uri
+                      nullable: true  # Hacemos explícito que puede ser null
               examples:
                 application/json:
                   value: 
@@ -96,6 +97,7 @@ paths:
                 foto:
                   type: string
                   format: binary
+                  nullable: true  # Hacemos explícito que puede ser null
       responses:
         '201':
           description: Usuario creado
@@ -126,6 +128,7 @@ paths:
                   foto:
                     type: string
                     format: uri
+                    nullable: true  # Hacemos explícito que puede ser null
               examples:
                 application/json:
                   value:
@@ -135,7 +138,7 @@ paths:
                     rol: Usuario
                     fecha_nacimiento: 1992-03-25
                     sexo: Masculino
-                    foto: http://example.com/foto3.jpg
+                    foto: null  # Enviamos foto como null
         '400':
           description: Error en los datos proporcionados
         '500':
@@ -181,6 +184,7 @@ paths:
                   foto:
                     type: string
                     format: uri
+                    nullable: true  # Hacemos explícito que puede ser null
               examples:
                 application/json:
                   value:
