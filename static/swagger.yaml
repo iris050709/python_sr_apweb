@@ -238,7 +238,7 @@ paths:
 
   /datos/{dato_id}:
     get:
-      summary: Obtener un registro de sensor por ID
+      summary: Obtener un registro de dato por ID
       tags: [Datos]
       parameters:
         - name: dato_id
@@ -259,7 +259,7 @@ paths:
           description: Error en el servidor
 
     delete:
-      summary: Eliminar un registro de sensor por ID
+      summary: Eliminar un registro de dato por ID
       tags: [Datos]
       parameters:
         - name: dato_id
