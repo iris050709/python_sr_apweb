@@ -10,38 +10,26 @@ from flask_jwt_extended import JWTManager
 load_dotenv()
 
 # Crear instancia de Flask
-app = Flask(__name__)
+app = Flask(__name__) 
 CORS(app)
 app.config['JWT_SECRET_KEY'] = 'HOLAAAAAAA'
 jwt = JWTManager(app)
 
-# Configuración de Swagger UI para la API de Usuarios
-SWAGGER_URL_USERS = "/api/users/docs"  # URL donde se accede a Swagger de usuarios
-API_URL_USERS = "/static/swaggerUSER.yaml"  # Ruta al archivo swagger.yaml de usuarios
+# Configuración de Swagger UI
+SWAGGER_URL = "/api/docs"  # URL donde se accede a Swagger
+API_URL = "/static/swagger.yaml"  # Ruta al archivo swagger.yaml
 
-swaggerui_users_blueprint = get_swaggerui_blueprint(
-    SWAGGER_URL_USERS,  # La URL donde se sirve Swagger UI
-    API_URL_USERS,      # Ruta al archivo YAML de Swagger para usuarios
-    config={            # Configuración adicional de Swagger UI
+# Configuración de Swagger UI
+swaggerui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL,  # La URL donde se sirve Swagger UI
+    API_URL,      # Ruta al archivo YAML de Swagger
+    config={      # Configuración adicional de Swagger UI
         'app_name': "User API"
     }
 )
 
-# Configuración de Swagger UI para la API de Sensores
-SWAGGER_URL_SENSORES = "/api/sensores/docs"  # URL donde se accede a Swagger de sensores
-API_URL_SENSORES = "/static/swaggerIOT.yaml"  # Ruta al archivo swagger.yaml de sensores
-
-swaggerui_sensores_blueprint = get_swaggerui_blueprint(
-    SWAGGER_URL_SENSORES,  # La URL donde se sirve Swagger UI
-    API_URL_SENSORES,      # Ruta al archivo YAML de Swagger para sensores
-    config={               # Configuración adicional de Swagger UI
-        'app_name': "Datos Sensores API"
-    }
-)
-
-# Registrar los blueprints de Swagger
-app.register_blueprint(swaggerui_users_blueprint, url_prefix=SWAGGER_URL_USERS)
-app.register_blueprint(swaggerui_sensores_blueprint, url_prefix=SWAGGER_URL_SENSORES)
+# Registrar el Blueprint de Swagger
+app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
 # Configuración de la base de datos
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')

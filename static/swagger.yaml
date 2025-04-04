@@ -1,0 +1,391 @@
+openapi: 3.0.0
+info:
+  title: API Unificada - Usuarios y Sensores
+  description: API para la gestión de usuarios y de datos de sensores (IoT).
+  version: 1.0.0
+
+servers:
+  - url: https://3.145.63.126/users/
+    description: Servidor Usuarios
+  - url: https://3.145.63.126/sensores/
+    description: Servidor Sensores
+
+paths:
+
+  ## --- USERS API ---
+
+  /:
+    get:
+      summary: Obtener todos los usuarios
+      tags: [Usuarios]
+      responses:
+        '200':
+          description: Lista de usuarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Usuario'
+              examples:
+                application/json:
+                  value:
+                    - id: 1
+                      nombre: Juan Pérez
+                      correo: juan.perez@example.com
+                      rol: Usuario
+                      fecha_nacimiento: 1990-01-01
+                      sexo: Masculino
+                      foto: http://example.com/foto.jpg
+                    - id: 2
+                      nombre: María García
+                      correo: maria.garcia@example.com
+                      rol: Administrador
+                      fecha_nacimiento: 1985-05-15
+                      sexo: Femenino
+                      foto: http://example.com/foto2.jpg
+        '400':
+          description: Solicitud incorrecta
+        '500':
+          description: Error en el servidor
+
+    post:
+      summary: Crear un nuevo usuario
+      tags: [Usuarios]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UsuarioInputForm'
+      responses:
+        '201':
+          description: Usuario creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '400':
+          description: Error en los datos proporcionados
+        '500':
+          description: Error en el servidor
+
+  /{user_id}:
+    get:
+      summary: Obtener un usuario por ID
+      tags: [Usuarios]
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Información del usuario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '404':
+          description: Usuario no encontrado
+        '500':
+          description: Error en el servidor
+
+    put:
+      summary: Actualizar un usuario por ID
+      tags: [Usuarios]
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioInput'
+      responses:
+        '200':
+          description: Usuario actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '400':
+          description: Error en los datos
+        '404':
+          description: Usuario no encontrado
+        '500':
+          description: Error en el servidor
+
+    delete:
+      summary: Eliminar un usuario por ID
+      tags: [Usuarios]
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Usuario eliminado
+        '404':
+          description: Usuario no encontrado
+        '500':
+          description: Error en el servidor
+
+  /check-email:
+    post:
+      summary: Verificar si un correo está registrado
+      tags: [Usuarios]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                correo:
+                  type: string
+      responses:
+        '200':
+          description: Resultado de la verificación
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exists:
+                    type: boolean
+        '400':
+          description: Falta el campo correo
+        '500':
+          description: Error en el servidor
+
+  /login:
+    post:
+      summary: Iniciar sesión
+      tags: [Usuarios]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                correo:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Token generado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '400':
+          description: Error de autenticación
+        '500':
+          description: Error en el servidor
+
+
+  ## --- SENSORES API ---
+
+  /datos:
+    get:
+      summary: Obtener todos los registros de sensores
+      tags: [Sensores]
+      responses:
+        '200':
+          description: Lista de registros
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SensorData'
+        '500':
+          description: Error en el servidor
+
+    post:
+      summary: Crear un nuevo registro de sensor
+      tags: [Sensores]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SensorDataInput'
+      responses:
+        '201':
+          description: Registro creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SensorData'
+        '400':
+          description: Datos inválidos
+        '500':
+          description: Error en el servidor
+
+  /datos/{dato_id}:
+    get:
+      summary: Obtener un registro de sensor por ID
+      tags: [Sensores]
+      parameters:
+        - name: dato_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Registro encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SensorData'
+        '404':
+          description: Registro no encontrado
+        '500':
+          description: Error en el servidor
+
+    delete:
+      summary: Eliminar un registro de sensor por ID
+      tags: [Sensores]
+      parameters:
+        - name: dato_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Registro eliminado
+        '404':
+          description: Registro no encontrado
+        '500':
+          description: Error en el servidor
+
+components:
+  schemas:
+
+    Usuario:
+      type: object
+      properties:
+        id:
+          type: integer
+        nombre:
+          type: string
+        correo:
+          type: string
+        rol:
+          type: string
+          enum: [Administrador, Usuario]
+        fecha_nacimiento:
+          type: string
+          format: date
+        sexo:
+          type: string
+          enum: [Femenino, Masculino]
+        foto:
+          type: string
+          format: uri
+          nullable: true
+
+    UsuarioInput:
+      type: object
+      properties:
+        nombre:
+          type: string
+        correo:
+          type: string
+        password:
+          type: string
+        rol:
+          type: string
+          enum: [Administrador, Usuario]
+        fecha_nacimiento:
+          type: string
+          format: date
+        sexo:
+          type: string
+          enum: [Femenino, Masculino]
+
+    UsuarioInputForm:
+      allOf:
+        - $ref: '#/components/schemas/UsuarioInput'
+        - type: object
+          properties:
+            foto:
+              type: string
+              format: binary
+              nullable: true
+
+    SensorData:
+      type: object
+      properties:
+        id:
+          type: integer
+        nivel_temperatura1:
+          type: number
+          format: float
+        estado_ventilador1:
+          type: string
+          enum: [Encendido, Apagado]
+        nivel_temperatura2:
+          type: number
+          format: float
+        estado_ventilador2:
+          type: string
+          enum: [Encendido, Apagado]
+        luz:
+          type: string
+          enum: [Encendida, Apagada]
+        estado_led:
+          type: string
+          enum: [Encendido, Apagado]
+        agua_detectada:
+          type: boolean
+        posicion_servo:
+          type: number
+          format: float
+        humedad_suelo1:
+          type: number
+          format: float
+        estado_bomba1:
+          type: string
+          enum: [Encendida, Apagada]
+        estado_bomba2:
+          type: string
+          enum: [Encendida, Apagada]
+        distancia1:
+          type: number
+          format: float
+        humedad_suelo2:
+          type: number
+          format: float
+        estado_bomba3:
+          type: string
+          enum: [Encendida, Apagada]
+        estado_bomba4:
+          type: string
+          enum: [Encendida, Apagada]
+        distancia2:
+          type: number
+          format: float
+
+    SensorDataInput:
+      allOf:
+        - $ref: '#/components/schemas/SensorData'
+      required:
+        - nivel_temperatura1
+        - estado_ventilador1
